@@ -1,0 +1,12 @@
+# Baseline: harbor check (current Claude Agent SDK implementation)
+date: 2026-06-12
+branch: feat/harborize-harbor-analyze-harbor-check (upstream/main @ 4e624bf3)
+command: uv run harbor check examples/tasks/hello-world -o <out>.json
+model: sonnet (default)
+wall_clock: 71s
+outcomes: 10 pass, 1 not_applicable (structured_data_schema), 0 fail
+result_json: 01-before-sdk-check-hello-world.json
+notes:
+- runs claude agent SDK in-process on host; tools Read/Glob/Grep; cwd = task dir
+- cost estimate discarded by current run_check (not surfaced anywhere)
+- no trial dir / trajectory artifacts produced

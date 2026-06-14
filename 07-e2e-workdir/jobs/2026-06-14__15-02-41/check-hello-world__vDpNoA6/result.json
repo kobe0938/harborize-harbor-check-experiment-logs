@@ -1,0 +1,111 @@
+{
+    "id": "ee348074-1fae-41de-9262-01509e2d133a",
+    "task_name": "check-hello-world",
+    "trial_name": "check-hello-world__vDpNoA6",
+    "trial_uri": "file:///Users/xiaokun/Desktop/github-exp/harbor/.claude/worktrees/moonlit-tinkering-pebble/experiment-logs/07-e2e-workdir/jobs/2026-06-14__15-02-41/check-hello-world__vDpNoA6",
+    "task_id": {
+        "path": "experiment-logs/07-e2e-workdir/task/check-hello-world"
+    },
+    "source": null,
+    "task_checksum": "2ed93f54f84402481d57a7fbec7ac40f0483a9b78ef673bd1f272266c4a1e019",
+    "config": {
+        "task": {
+            "path": "experiment-logs/07-e2e-workdir/task/check-hello-world",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "check-hello-world__vDpNoA6",
+        "trials_dir": "experiment-logs/07-e2e-workdir/jobs/2026-06-14__15-02-41",
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "claude-code",
+            "import_path": null,
+            "model_name": "sonnet",
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "extra_allowed_hosts": [],
+            "kwargs": {},
+            "env": {},
+            "mcp_servers": []
+        },
+        "environment": {
+            "type": "daytona",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "env": {},
+            "kwargs": {},
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "env": {},
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "job_id": "2515c2c4-ffeb-4988-a727-3be8e2692867"
+    },
+    "agent_info": {
+        "name": "claude-code",
+        "version": "2.1.177",
+        "model_info": {
+            "name": "sonnet",
+            "provider": null
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 122984,
+        "n_cache_tokens": 112100,
+        "n_output_tokens": 2509,
+        "cost_usd": 0.11207475,
+        "rollout_details": null,
+        "metadata": null
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 1.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2026-06-14T22:02:42.814808Z",
+    "finished_at": "2026-06-14T22:04:00.891580Z",
+    "environment_setup": {
+        "started_at": "2026-06-14T22:02:42.978856Z",
+        "finished_at": "2026-06-14T22:02:49.191153Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-06-14T22:02:49.191205Z",
+        "finished_at": "2026-06-14T22:03:05.524583Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-06-14T22:03:05.524675Z",
+        "finished_at": "2026-06-14T22:03:53.427982Z"
+    },
+    "verifier": {
+        "started_at": "2026-06-14T22:03:56.725677Z",
+        "finished_at": "2026-06-14T22:04:00.542517Z"
+    },
+    "step_results": null
+}

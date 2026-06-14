@@ -1,0 +1,18 @@
+version = "1.0"
+
+[agent]
+timeout_sec = 1800.0
+
+[verifier]
+timeout_sec = 120.0
+
+[environment]
+# Prebuilt image (no Dockerfile) so harbor skips the slow remote image build and
+# uploads environment/ into the sandbox at runtime. python:3.13-slim provides
+# python3 (for the verifier) plus tar/gzip (for the upload). The task under
+# review is uploaded to /task (the image's working directory is /).
+docker_image = "python:3.13-slim"
+build_timeout_sec = 600.0
+cpus = 1
+memory_mb = 2048
+storage_mb = 10240

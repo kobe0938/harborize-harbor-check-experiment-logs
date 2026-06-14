@@ -1,0 +1,61 @@
+# After: harbor check (harborized -> Harbor Run task) on Daytona
+date: 2026-06-12
+branch: feat/harborize-harbor-analyze-harbor-check
+command: PYTHONPATH=src .venv/bin/harbor check examples/tasks/hello-world -e daytona -o <out>.json --work-dir <wd>
+model: sonnet (default)
+result_json: 02-after-daytona-hello-world.json
+workdir: 02-after-daytona-workdir/
+
+## Outcome
+reward: 1.0 (verifier validated the agent's JSON against the rubric criteria)
+verdict: 10 pass, 1 not_applicable (structured_data_schema), 0 fail
+outcomes vs baseline (01-before): IDENTICAL on all 11 criteria
+estimated_agent_cost_usd: 0.09769635   (baseline discarded this; now surfaced)
+
+## Timing (total 17m28s, from trial result.json started/finished)
+build + sandbox start + claude-code bootstrap install : ~16m21s  (16:43:17 -> 16:59:38)
+agent run (claude reviewing /task)                    : ~1m00s   (16:59:38 -> 17:00:38)
+verifier (validate.py) + finalize                     : ~7s      (17:00:38 -> 17:00:45)
+
+Note: agent work (~60s, $0.098) ~ matches SDK baseline (71s). The ~16m was
+environment build, an anomalously slow Daytona snapshot build (user reports a
+simple container normally builds in ~10s). The build SUCCEEDED; it was slow,
+not broken. Snapshot is content-addressed (harbor__5b0d2fe1dc44__snapshot), so
+re-running the same check reuses it and should drop to ~sandbox+agent only.
+
+## What the harborized path gains over the SDK path
+- runs in an isolated environment (here: remote Daytona), not in-process on host
+- produces a real trial dir: agent/trajectory.json, verifier output, result.json
+- surfaces agent cost (SDK path discarded it)
+- verifier validates result against rubric inside the env (reward = valid check)
+
+## What changed in behavior
+- auth: container cannot use a `claude /login` keychain session; needs a
+  forwardable credential (ANTHROPIC_API_KEY / CLAUDE_CODE_OAUTH_TOKEN / cloud).
+  Added host-side preflight _check_forwardable_auth() for a clear early error.
+- latency: instant start (SDK) -> build+bootstrap dominated (env-dependent).
+
+## ROOT CAUSE of the ~16min build (found after control experiment)
+Control: `harbor run -p examples/tasks/hello-world -e daytona` -> 37s total.
+Same Daytona, same agent/model. So Daytona was NOT the problem; our task was.
+
+Why: harbor's Daytona/Docker start() has a fast lane. If the task sets
+[environment] docker_image AND has no Dockerfile, it creates the sandbox
+directly from the prebuilt image (NO build) and uploads environment/ into the
+sandbox at runtime (_upload_environment_dir_after_start, base.py:699;
+should_use_prebuilt_docker_image / should_upload_environment_dir,
+environments/definition.py). hello-world hits this no-build path.
+
+Our v1 wrapper had `COPY task /task` in a Dockerfile, which forces
+Image.from_dockerfile(...) -> a full remote image build per unique task
+(snapshot keyed on env-dir hash). That cold build was the ~16 min, not the agent.
+
+## FIX (Design B): prebuilt image + runtime upload, zero build
+- check_task_template/: deleted Dockerfile; task.toml now sets
+  docker_image = "python:3.13-slim" (has python3 for validate.py + tar/gzip for
+  the upload; default workdir is / so environment/task lands at /task).
+- assemble_check_task: no longer copies a Dockerfile; environment/ holds only task/.
+- Expected: sandbox starts from the prebuilt image with no build (like the 37s
+  hello-world control), task uploaded to /task, agent + verifier as before.
+- Both `-e docker` and `-e daytona` call _upload_environment_dir_after_start, so
+  the default local path works too.

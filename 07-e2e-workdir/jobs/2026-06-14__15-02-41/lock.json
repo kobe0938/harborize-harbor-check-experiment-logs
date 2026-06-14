@@ -1,0 +1,70 @@
+{
+    "schema_version": 1,
+    "created_at": "2026-06-14T22:02:42.765917Z",
+    "harbor": {
+        "version": "0.13.2",
+        "git_commit_hash": "4e624bf3f4b6b999498649d6bcab32bec4f2051e",
+        "is_editable": true
+    },
+    "invocation": [
+        ".venv/bin/harbor",
+        "check",
+        "examples/tasks/hello-world",
+        "-e",
+        "daytona",
+        "-o",
+        "experiment-logs/07-e2e-after-simplify.json",
+        "--work-dir",
+        "experiment-logs/07-e2e-workdir"
+    ],
+    "n_concurrent_trials": 1,
+    "retry": {
+        "max_retries": 0,
+        "exclude_exceptions": [
+            "RewardFileEmptyError",
+            "VerifierOutputParseError",
+            "AgentTimeoutError",
+            "RewardFileNotFoundError",
+            "VerifierTimeoutError"
+        ],
+        "wait_multiplier": 1.0,
+        "min_wait_sec": 1.0,
+        "max_wait_sec": 60.0
+    },
+    "trials": [
+        {
+            "task": {
+                "name": "check-hello-world",
+                "type": "local",
+                "digest": "sha256:6e2935e3cb774948d31f227af4b820d8088b4281ed87b5c441fb470ac5a72db4",
+                "path": "experiment-logs/07-e2e-workdir/task/check-hello-world"
+            },
+            "timeout_multiplier": 1.0,
+            "agent": {
+                "name": "claude-code",
+                "model_name": "sonnet",
+                "skills": [],
+                "extra_allowed_hosts": [],
+                "kwargs": {},
+                "env": {},
+                "mcp_servers": []
+            },
+            "skills": [],
+            "environment": {
+                "type": "daytona",
+                "force_build": false,
+                "delete": true,
+                "cpu_enforcement_policy": "auto",
+                "memory_enforcement_policy": "auto",
+                "extra_docker_compose": [],
+                "env": {},
+                "kwargs": {},
+                "extra_allowed_hosts": []
+            },
+            "verifier": {
+                "env": {},
+                "disable": false
+            }
+        }
+    ]
+}

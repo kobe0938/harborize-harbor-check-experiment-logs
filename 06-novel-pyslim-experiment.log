@@ -1,0 +1,39 @@
+# Experiment 06: NOVEL (cache-busted) python:3.13-slim Dockerfile build on Daytona
+date: 2026-06-14
+command: harbor run -p experiment-logs/06-novel-pyslim-experiment/check-task \
+         -m anthropic/claude-sonnet-4-6 -a claude-code -e daytona
+task: FROM python:3.13-slim + COPY task /task, no docker_image, unique
+      CACHE_BUST.txt in build context (env-dir hash cd25b751ec0d, != run-05).
+      build_timeout_sec=300 (fail fast if slow). test.sh: no apt (python3 in image).
+
+## Result: SUCCESS, reward 1.0, total 4m10s (did NOT hit 5-min build cap)
+Timeline (job 2026-06-14__14-23-57):
+  14:23:58 -> 14:27:11  (~3m13s)  build + sandbox start + agent bootstrap
+  14:27:11 -> 14:28:02  (~51s)    agent review (succeeded)
+  14:28:02 -> 14:28:07  (~5s)     verifier (validate.py, python3 present, fast)
+
+## Reconciliation of ALL runs
+  run-02  Dockerfile FROM python:3.13-slim, FIRST use   -> ~16 min  (cold base)
+  run-04  prebuilt python:3.13-slim, no build           -> 92 s
+  run-05  Dockerfile FROM ubuntu:24.04 (warm base)       -> ~2.6 min build (apt verifier timeout)
+  run-06  Dockerfile FROM python:3.13-slim, NOW warm     -> ~3.2 min build, 4m10s total, OK
+
+## Conclusion
+- The 16 min (run-02) was the python:3.13-slim BASE being COLD on Daytona's
+  BUILD service the first time. Once warm (cached on Daytona's builders from our
+  prior runs), a fresh build from it is ~3 min EVEN WITH NOVEL content.
+- The COPY / task-novelty was NEVER the bottleneck: cache-busted content still
+  built in ~3 min. "each check is novel => slow" is refuted.
+- User's caching suspicion is correct, but it's BASE-IMAGE caching on Daytona's
+  builders, not whole-task caching.
+
+## Decision: still KEEP prebuilt python:3.13-slim (run-04, 92s)
+- Fastest: 92s vs ~4 min (the Dockerfile approach rebuilds every run, since each
+  check's content is unique).
+- No build => no cold-base cliff. The prebuilt path pulls the image via the RUN
+  service (fast), sidestepping the BUILD-service cold start that caused run-02's
+  16 min on first use of a base. The Dockerfile approach would pay that ~16-min
+  penalty again on any fresh Daytona account/region where the base is cold.
+- python3 already in the image => no apt (which run-05 proved is slow on Daytona).
+The Dockerfile+python:3.13-slim approach is VIABLE (~4 min) if idiomatic form is
+preferred, but it is slower per-run and carries the cold-start cliff.

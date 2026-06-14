@@ -1,0 +1,30 @@
+# Experiment 05: Dockerfile build variant (FROM ubuntu:24.04 + COPY) on Daytona
+date: 2026-06-14
+command: harbor run -p experiment-logs/05-dockerfile-experiment/check-task \
+         -m anthropic/claude-sonnet-4-6 -a claude-code -e daytona
+task: novel wrapper, FROM ubuntu:24.04 + COPY task /task (no docker_image),
+      test.sh installs python3 via apt at verify time.
+
+## Result: FAILED (VerifierTimeoutError), total 5m41s
+Timeline (from trial mtimes), job 2026-06-14__14-08-22:
+  14:08:22 -> 14:11:00  (~2m38s)  image build + sandbox start + agent bootstrap
+  14:11:00 -> 14:12:00  (~60s)    agent ran the review (succeeded; wrote result)
+  14:12:02 -> 14:14:04  (122s)    verifier ran -> TIMED OUT at 120s limit
+verifier/ is empty: test.sh was killed mid-run, before writing reward.
+
+## What it proves
+1. The build did NOT stall. Novel ubuntu:24.04 + COPY reached the agent in
+   ~2.6 min, NOT the 16 min the python:3.13-slim build took. => the 16 min was
+   the python:3.13-slim BASE (cold on Daytona's builder), not novelty.
+   => "whole-image global cache" theory is largely refuted; "warm ubuntu base"
+   theory holds.
+2. A new villain: apt is SLOW on Daytona's ubuntu sandbox. `apt-get install
+   python3` alone blew the 120s verifier timeout, and likely padded the agent
+   bootstrap (which also apt-installs curl/procps) toward that ~2.6 min.
+
+## Decision: KEEP the prebuilt python:3.13-slim approach (run-04, 92s)
+The Dockerfile+ubuntu path is viable on build speed but strictly worse here:
+validate.py needs python3, ubuntu lacks it, and installing python3 (at verify
+time OR via RUN at build time) means slow Daytona apt. The prebuilt
+python:3.13-slim image already has python3 (+ tar/gzip), so it never touches
+apt for python, no build, fastest, and it's the only variant that succeeded.

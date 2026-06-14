@@ -1,0 +1,16 @@
+version = "1.0"
+
+[agent]
+timeout_sec = 1800.0
+
+[verifier]
+timeout_sec = 300.0
+
+[environment]
+# experiment-06: Dockerfile build, FROM python:3.13-slim, novel content (cache-bust).
+# build_timeout_sec is short on purpose: if a fresh python:3.13-slim build is slow,
+# fail fast at 5 min instead of stalling ~16 min like the original run.
+build_timeout_sec = 300.0
+cpus = 1
+memory_mb = 2048
+storage_mb = 10240

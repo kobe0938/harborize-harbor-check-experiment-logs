@@ -1,0 +1,46 @@
+{
+  "behavior_in_task_description": {
+    "outcome": "pass",
+    "explanation": "The instruction explicitly states to create a file named 'hello.txt' with the exact content 'Hello, world!'. Both the filename and content are specified, matching what the tests verify."
+  },
+  "behavior_in_tests": {
+    "outcome": "pass",
+    "explanation": "Tests check both that hello.txt exists at /app/hello.txt and that its content (stripped) equals 'Hello, world!', fully covering the behavior described in the instruction."
+  },
+  "informative_test_structure": {
+    "outcome": "pass",
+    "explanation": "test_state.py has two clearly named functions (test_hello_file_exists, test_hello_file_contents) with descriptive assertions and helpful failure messages."
+  },
+  "anti_cheating_measures": {
+    "outcome": "pass",
+    "explanation": "The solution and tests are not baked into the image. A canary string is present in both solution and test files. The task requires producing a file in /app, which only a running agent can do — there is no embedded answer the agent could trivially copy."
+  },
+  "structured_data_schema": {
+    "outcome": "not_applicable",
+    "explanation": "The task produces a plain-text file, not structured data (JSON, CSV, DB schema, etc.), so a schema definition is not required."
+  },
+  "pinned_dependencies": {
+    "outcome": "pass",
+    "explanation": "uv is pinned to 0.9.7 via the install URL, pytest is pinned to 8.4.1, and pytest-json-ctrf is pinned to 0.3.5. The only unpinned item is curl (apt), which does not require pinning per the criteria."
+  },
+  "typos": {
+    "outcome": "pass",
+    "explanation": "No typos found in filenames, paths, commands, or variable names across all files. 'Hello, world!' is spelled consistently throughout instruction, solution, and tests."
+  },
+  "tests_or_solution_in_image": {
+    "outcome": "pass",
+    "explanation": "The Dockerfile only contains 'FROM ubuntu:24.04' and 'WORKDIR /app' — neither tests/ nor solution/ directories are copied into the image."
+  },
+  "test_deps_in_image": {
+    "outcome": "pass",
+    "explanation": "No test dependencies are installed in the Dockerfile. All test dependencies (uv, pytest, pytest-json-ctrf) are installed at test time in tests/test.sh."
+  },
+  "hardcoded_solution": {
+    "outcome": "pass",
+    "explanation": "solve.sh performs the actual file-creation action ('echo \"Hello, world!\" > hello.txt'), which is the legitimate operation an agent would perform. This is not echoing a pre-computed answer to bypass any computation — it is the task itself."
+  },
+  "file_reference_mentioned": {
+    "outcome": "pass",
+    "explanation": "The instruction explicitly names the output file as 'hello.txt', matching what the tests look for."
+  }
+}
