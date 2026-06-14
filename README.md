@@ -88,10 +88,10 @@ $ PYTHONPATH=src .venv/bin/harbor check examples/tasks/hello-world -e daytona \
 Estimated agent cost: $0.1087
 ```
 
-Result: **1m10s**, 
-outcomes identical to the SDK baseline with similar runtime.
+Result: **1m10s**, about the same as the **~71s** in-process SDK baseline, with
+identical outcomes.
 
-we can always do
+we can always do without -o and -work-dir
 ```
 uv check examples/tasks/hello-world -e daytona
 ```
